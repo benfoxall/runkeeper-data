@@ -10,7 +10,7 @@ var Redis = require('ioredis');
 var request = require('request');
 var url = require('url');
 
-var redis = new Redis(process.env.REDISTOGO_URL);
+var redis = new Redis(process.env.REDIS_URL);
 var app = express();
 
 // just persist the whole thing in the session for now (won't be on the client)
@@ -67,18 +67,9 @@ app.use(session(opts));
 app.use(passport.initialize());
 app.use(passport.session());
 
-
-app.set('view engine', 'html');
-app.engine('html', require('hbs').__express);
-
 // GET  / - status and frontend ui
 // GET  /auth/runkeeper - authorise session with runkeeper
 // POST /logout - de-authorise
-// GET  /data/* proxy runkeeper
-
-app.get('/', function(req, res){
-  res.render('index', { user: req.user });
-});
 
 app.get('/auth/runkeeper', passport.authenticate('runkeeper'));
 
@@ -93,42 +84,6 @@ app.get('/logout', function(req, res){
   res.redirect('/');
 });
 
-app.get('/picture', function(req, res){
-  if(!req.user) return res.status(401).send("Unauthorised");
-  request(req.user.normal_picture).pipe(res)
-})
-
-app.get('/data/fitnessActivities', function(req, res){
-  if(!req.user) return res.status(401).send("Unauthorised")
-
-  var url_parts = url.parse(req.url, true);
-
-  request({
-    url:'https://api.runkeeper.com/fitnessActivities' + (url_parts.search || ''),
-    headers: {
-      'Authorization': 'Bearer ' + req.user._access_token,
-      'Accept': 'application/vnd.com.runkeeper.FitnessActivityFeed+json'
-    }
-  }).pipe(res);
-
-})
-
-
-app.get('/data/fitnessActivities/:id', function(req, res){
-  if(!req.user) return res.status(401).send("Unauthorised")
-
-  var url_parts = url.parse(req.url, true);
-
-  console.log('https://api.runkeeper.com/fitnessActivities/' + req.params.id + (url_parts.search || ''));
-  request({
-    url:'https://api.runkeeper.com/fitnessActivities/' + req.params.id + (url_parts.search || ''),
-    headers: {
-      'Authorization': 'Bearer ' + req.user._access_token,
-      'Accept': 'application/vnd.com.runkeeper.FitnessActivity+json'
-    }
-  }).pipe(res);
-
-})
 
 app.use(express.static(__dirname + '/public'));
 
