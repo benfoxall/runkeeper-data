@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Runkeeper Data</title>
+    <link rel="stylesheet" href="build.css" media="screen">
+    <script type="text/javascript">
+      document.getElementsByTagName('html')[0].className='serviceWorker'in navigator?'has-sw':'no-sw'
+    </script>
+    <style media="screen">
+      .has-sw #support-notice, .no-sw main {display:none}
+      [data-show] {display:none}
+    </style>
+  </head>
+  <body class="ph3 mw8 mb6">
+    <heading>
+      <h1 class="f-subheadline">Runkeeper Data Export</h1>
+    </heading>
+
+    <div id="support-notice">
+      <hr />
+      <h2>&times; Requires a browser with Service Worker support</h2>
+    </div>
+
+    <main class="mw7">
+
+      <hr />
+
+      <p class="f3" data-text="_.problem || ' '"></p>
+
+      <div data-show="!_.logged_in">
+        <h2 class="f2"><a href="login">Sign in with Runkeeper</a></h2>
+      </div>
+      <div data-show="_.logged_in">
+        <h2 class="f2">Signed in as <em data-text="_.logged_in"></em>  <a href="logout">&times;</a></h2>
+        <h2 class="f3">
+          <a data-show="_.paused"  href="javascript:tell('resume')">✕</a>
+          <a data-show="!_.paused" href="javascript:tell('pause')">⬇️</a>
+          [<span data-text="_.activity_downloaded"></span>/<span data-text="_.activity_total"></span>]
+        </h2>
+      </div>
+
+      <div data-show="_.activity_downloaded > 0">
+
+        <hr />
+
+        <h1>Formats</h1>
+
+        <dl>
+          <dt class="f4 mt3"><a href="#">overview.csv</a></dt>
+          <dd>An aggregation of all activities</dd>
+
+          <dt class="f4 mt3"><a href="#">distances.csv</a></dt>
+          <dd>Activity, time, distance</dd>
+
+          <dt class="f4 mt3"><a href="#">paths.json</a></dt>
+          <dd>Geojson formatted paths</dd>
+
+          <dt class="f4 mt3"><a href="#">paths.raw</a></dt>
+          <dd>…</dd>
+        </dl>
+
+        <hr />
+
+        <h1>Examples</h1>
+
+        <h2>summary.csv &rarr; text</h2>
+        <pre class="bg-light-gray pa3"><code>▶︎</code></pre>
+
+        <h2>summary.csv &rarr; svg</h2>
+        <pre class="bg-light-gray pa3"><code>▶︎</code></pre>
+
+        <h2>summary.csv &rarr; svg (2)</h2>
+        <pre class="bg-light-gray pa3"><code>▶︎</code></pre>
+
+        <h2>summary.csv &rarr; svg (2)</h2>
+        <pre class="bg-light-gray pa3"><code>▶︎</code></pre>
+
+      </div>
+    </main>
+
+    <script type="text/javascript">
+
+
+      var tell = function(){}
+
+
+      if ('serviceWorker' in navigator) {
+
+        var bindings =[
+          binding('data-show', function(el, d) {el.style.display = d ? '' : 'none'}),
+          binding('data-text', function(el, d) {el.textContent = d || '_'})
+        ]
+
+        // var t = setTimeout(bindings[1],500, {problem: "Problem: didn't get state from SW"})
+
+        navigator.serviceWorker.addEventListener('message', function(event) {
+          if(event.data.state) {
+            bindings.forEach(function(binding) {
+              binding(event.data.state)
+            })
+          }
+        })
+
+
+        // show a warning if we don't hear anything
+        navigator.serviceWorker.addEventListener('message',
+          window.clearTimeout.bind(window,
+            setTimeout(bindings[1], 500, {
+              problem: "Problem: didn't get state from SW"
+            }
+          )
+        ))
+
+
+
+        navigator.serviceWorker.register('sw.js', {scope: './'})
+        .then(function (registration) {
+          var serviceWorker = registration.installing ||
+                              registration.waiting ||
+                              registration.active
+
+          serviceWorker.postMessage('broadcast')
+          tell = serviceWorker.postMessage.bind(serviceWorker)
+
+        })
+      }
+
+
+
+      // incredibly hacky, but slightly flexible data->html binding script
+      function binding(attr, fn) {
+        var bindings =
+          [].map.call(document.querySelectorAll('[' + attr + ']'),
+            function(el) {
+              return {
+                element: el,
+                fn: new Function('_','return ' + el.getAttribute(attr))
+              }
+            })
+        var init
+        return function(state) {
+          bindings.forEach(function(b) {
+            if(!init) b.element.removeAttribute(attr)
+            fn(b.element, b.fn(state))
+          })
+          init = true
+        }
+      }
+
+
+    </script>
+  </body>
+</html>
