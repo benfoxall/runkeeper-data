@@ -23,25 +23,25 @@ self.addEventListener('install', function(event) {
 
 self.addEventListener('fetch', function(event) {
 
-    if(event.request.url.match(/sw\/summary\.csv$/))
+    if(event.request.url.match(/data\/summary\.csv$/))
       respond(event, summaryResponse)
 
-    if(event.request.url.match(/sw\/distances\.csv$/))
+    if(event.request.url.match(/data\/distances\.csv$/))
       respond(event, distancesResponse)
 
-    if(event.request.url.match(/sw\/paths\.csv$/))
+    if(event.request.url.match(/data\/paths\.csv$/))
       respond(event, pathsResponse)
 
-    if(event.request.url.match(/sw\/geo\.json$/))
+    if(event.request.url.match(/data\/geo\.json$/))
       respond(event, geoJSONResponse)
 
-    if(event.request.url.match(/sw\/geo\.simple\.json$/))
+    if(event.request.url.match(/data\/geo\.simple\.json$/))
       respond(event, geoJSONResponseSimple)
 
-    if(event.request.url.match(/sw\/binary\.path\.b$/))
+    if(event.request.url.match(/data\/binary\.path\.b$/))
       respond(event, binaryPathResponse)
 
-    if(event.request.url.match(/sw\/expire-cache$/)){
+    if(event.request.url.match(/data\/expire-cache$/)){
       event.respondWith(
         caches.delete(RK_CACHE)
         .then(function(){
