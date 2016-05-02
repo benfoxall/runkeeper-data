@@ -433,8 +433,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 		}
 
 		if ( state !== STATE.NONE ) {
-			document.addEventListener( 'mousemove', onMouseMove, false );
-			document.addEventListener( 'mouseup', onMouseUp, false );
+			document.addEventListener( 'xmousemove', onMouseMove, false );
+			document.addEventListener( 'xmouseup', onMouseUp, false );
 			scope.dispatchEvent( startEvent );
 		}
 
@@ -709,16 +709,16 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}
 
-	this.domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
-	this.domElement.addEventListener( 'mousedown', onMouseDown, false );
-	this.domElement.addEventListener( 'mousewheel', onMouseWheel, false );
-	this.domElement.addEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
+	this.domElement.addEventListener( 'xcontextmenu', function ( event ) { event.preventDefault(); }, false );
+	this.domElement.addEventListener( 'xmousedown', onMouseDown, false );
+	this.domElement.addEventListener( 'xmousewheel', onMouseWheel, false );
+	this.domElement.addEventListener( 'xDOMMouseScroll', onMouseWheel, false ); // firefox
 
-	this.domElement.addEventListener( 'touchstart', touchstart, false );
-	this.domElement.addEventListener( 'touchend', touchend, false );
-	this.domElement.addEventListener( 'touchmove', touchmove, false );
+	this.domElement.addEventListener( 'xtouchstart', touchstart, false );
+	this.domElement.addEventListener( 'xtouchend', touchend, false );
+	this.domElement.addEventListener( 'xtouchmove', touchmove, false );
 
-	window.addEventListener( 'keydown', onKeyDown, false );
+	window.addEventListener( 'xkeydown', onKeyDown, false );
 
 	// force an update at start
 	this.update();
