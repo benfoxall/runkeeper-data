@@ -47,8 +47,11 @@
         <h1>Formats</h1>
 
         <dl>
-          <dt class="f4 mt3"><a href="/data/summary.csv">data/<strong>overview.csv</strong></a></dt>
+          <dt class="f4 mt3"><a href="/data/totals.json">data/<strong>totals.json</strong></a></dt>
           <dd>An aggregation of all activities</dd>
+
+          <dt class="f4 mt3"><a href="/data/summary.csv">data/<strong>summary.csv</strong></a></dt>
+          <dd>High level details of each activity</dd>
 
           <dt class="f4 mt3"><a href="/data/distances.csv">data/<strong>distances.csv</strong></a></dt>
           <dd>Activity, time, distance</dd>
@@ -70,17 +73,35 @@
 
         <h1>Examples</h1>
 
-        <h2>summary.csv &rarr; text</h2>
-        <pre class="bg-light-gray pa3"><code>▶︎</code></pre>
+        <h2>Overview text (totals.json)</h2>
+        <div class="bg-light-gray pa3 tc">
+          <button data-demo="totalText">▶︎</button>
+        </div>
 
-        <h2>summary.csv &rarr; svg</h2>
-        <pre class="bg-light-gray pa3"><code>▶︎</code></pre>
+        <h2>Overview circle (totals.json)</h2>
+        <div class="bg-light-gray pa3 tc">
+          <button data-demo="runkeeperSummaryEarth">▶︎</button>
+        </div>
 
-        <h2>summary.csv &rarr; svg (2)</h2>
-        <pre class="bg-light-gray pa3"><code>▶︎</code></pre>
+        <h2>Overview map (totals.json)</h2>
+        <div class="bg-light-gray pa3 tc">
+          <button data-demo="runkeeperSummaryUK">▶︎</button>
+        </div>
 
-        <h2>summary.csv &rarr; svg (2)</h2>
-        <pre class="bg-light-gray pa3"><code>▶︎</code></pre>
+        <h2>Durations (distances.csv)</h2>
+        <div class="bg-light-gray pa3 tc">
+          <button data-demo="runkeeperDuration">▶︎</button>
+        </div>
+
+        <h2>Paths (geo.json.csv)</h2>
+        <div class="bg-light-gray pa3 tc">
+          <button data-demo="runkeeperPaths">▶︎</button>
+        </div>
+
+        <h2>Globe (paths.b)</h2>
+        <div class="bg-light-gray pa3 tc">
+          <button data-demo="runkeeperGlobe">▶︎</button>
+        </div>
 
       </div>
     </main>
@@ -159,7 +180,84 @@
         }
       }
 
+    </script>
+
+
+    <script type="text/javascript" src="demos/lib/d3.min.js"></script>
+    <script type="text/javascript" src="demos/lib/three.min.js"></script>
+    <script type="text/javascript" src="demos/lib/three.orbit.js"></script>
+    <script type="text/javascript" src="demos/lib/tween.min.js"></script>
+    <script type="text/javascript" src="lib/geofn.js"></script>
+
+    <script>
+      // hook up the demos
+
+      [].forEach.call(document.querySelectorAll('[data-demo]'), function(el){
+        var key = el.dataset.demo
+
+        var s = document.createElement('script')
+        s.src = 'demos/' + key + '.js'
+        document.body.appendChild(s)
+
+        // create an element for the demo to use
+        var demoEl = document.createElement('div')
+        el.parentElement.insertBefore(demoEl, el)
+
+        el.addEventListener('click', function(e) {
+          e.preventDefault()
+          window[key](demoEl)
+        }, false)
+      })
+
+
 
     </script>
+
+    <style media="screen">
+
+    svg.runkeeper-duration text {
+      font-family: Gotham, arial;
+      font-size:2vw
+    }
+    svg.runkeeper-duration path {
+      stroke-width:1;
+      fill:none;
+      stroke: none;
+    }
+    svg.runkeeper-duration circle {
+      opacity: 1;
+    }
+    svg.runkeeper-duration .line {
+      stroke: #08f;
+      opacity: 0.5;
+    }
+
+
+    .runkeeper-paths path.activity {
+      stroke-width: 1px;
+      stroke: rgba(255, 150, 0, 0.8);
+      /*stroke: #f80;*/
+      stroke-linejoin: round;
+      fill: none;
+    }
+    .runkeeper-paths path.graticule {
+      stroke-width: 1px;
+      stroke: #ccc;
+      fill: none;
+    }
+    .runkeeper-paths circle.choice {
+      transition:opacity .5s;
+      opacity: 0.02;
+      cursor: pointer;
+    }
+    .runkeeper-paths circle.choice:hover {
+      opacity: .6
+    }
+    .runkeeper-paths .vis {
+      min-height:600px;
+    }
+
+
+    </style>
   </body>
 </html>
