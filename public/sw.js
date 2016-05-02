@@ -2,6 +2,7 @@ console.log("sw.js")
 
 importScripts(
   'sw.auth.js',
+  'sw.db.js',
   'sw.downloader.js'
 )
 
