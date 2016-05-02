@@ -21,7 +21,8 @@ Auth.prototype.check = function() {
       }
 
       this.broadcaster()
-      return true
+
+      return this.state.logged_in
     })
 
 }
