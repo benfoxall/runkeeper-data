@@ -16,7 +16,7 @@ function Downloader(state, broadcaster) {
 
 Downloader.prototype.burst = function(path) {
   return this.state.development ?
-    (path + (path.indexOf('?') > -1 ? '&' : '?') + 'dev') :
+    (path + (path.indexOf('?') > -1 ? '&' : '?') + 'dev2') :
     path
 }
 
@@ -92,7 +92,7 @@ Downloader.prototype.destroy = function() {
   this.state.total = 0
   this.state.downloaded = 0
   this.state.paused = false
-  
+
   this.broadcaster()
 }
 
