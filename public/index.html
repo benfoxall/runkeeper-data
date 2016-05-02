@@ -29,14 +29,14 @@
       <p class="f3" data-text="_.problem || ' '"></p>
 
       <div data-show="!_.logged_in">
-        <h2 class="f2"><a href="login">Sign in with Runkeeper</a></h2>
+        <h2 class="f2"><a href="/auth/runkeeper">Sign in with Runkeeper</a></h2>
       </div>
       <div data-show="_.logged_in">
-        <h2 class="f2">Signed in as <em data-text="_.logged_in"></em>  <a href="logout">&times;</a></h2>
+        <h2 class="f2">Signed in as <a data-href="_.u_url" data-text="_.u_name"></a>  <a href="logout">&times;</a></h2>
         <h2 class="f3">
           <a data-show="_.paused"  href="javascript:tell('resume')">✕</a>
           <a data-show="!_.paused" href="javascript:tell('pause')">⬇️</a>
-          [<span data-text="_.activity_downloaded"></span>/<span data-text="_.activity_total"></span>]
+          [<span data-text="_.downloaded"></span>/<span data-text="_.total"></span>]
         </h2>
       </div>
 
@@ -82,6 +82,7 @@
     <script type="text/javascript">
 
 
+      //navigator.serviceWorker.controller.postMessage('message')
       var tell = function(){}
 
 
@@ -89,10 +90,9 @@
 
         var bindings =[
           binding('data-show', function(el, d) {el.style.display = d ? '' : 'none'}),
-          binding('data-text', function(el, d) {el.textContent = d || '_'})
+          binding('data-text', function(el, d) {el.textContent = d || '_'}),
+          binding('data-href', function(el, d) {el.href = d || '#'})
         ]
-
-        // var t = setTimeout(bindings[1],500, {problem: "Problem: didn't get state from SW"})
 
         navigator.serviceWorker.addEventListener('message', function(event) {
           if(event.data.state) {
@@ -121,6 +121,8 @@
                               registration.active
 
           serviceWorker.postMessage('broadcast')
+
+          // tell sometimes points at redundant sw
           tell = serviceWorker.postMessage.bind(serviceWorker)
 
         })
@@ -135,7 +137,7 @@
             function(el) {
               return {
                 element: el,
-                fn: new Function('_','return ' + el.getAttribute(attr))
+                fn: new Function('_','try{return ' + el.getAttribute(attr) + '} catch(e) {}')
               }
             })
         var init

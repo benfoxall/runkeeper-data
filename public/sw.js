@@ -1,19 +1,17 @@
 console.log("sw.js")
 
-var state = {
-  logged_in: 'Ben Foxall',
-  activity_total: 34,
-  activity_downloaded: 1,
+importScripts(
+  'sw.auth.js',
+  'sw.downloader.js'
+)
+
+
+// the overall state of the tool (todo - store in indexedDB?)
+const state = {
+  logged_in: false
 }
 
-setInterval(f => {
-  if(!state.paused){
-    state.activity_total++
-    broadcastState()
-  }
-}, 300)
-
-function broadcastState() {
+function broadcast() {
   self.clients.matchAll()
   .then(function(clients) {
     clients.forEach(function(client) {
@@ -23,27 +21,59 @@ function broadcastState() {
 }
 
 
+var downloader = new Downloader(state, broadcast)
+var auth = new Auth(state, broadcast)
+
+// dispatch events from postMessage
 self.addEventListener('message', e => {
   switch (e.data) {
+
+    /*
+      Re-broadcast the current ui state (for when
+      a new window needs the state)
+    */
     case 'broadcast':
-      broadcastState()
+      broadcast()
       break
 
+    /*
+      Fetch the current user state
+    */
+    case 'updateCredentials':
+      auth.check()
+      break
+
+    /*
+      Request all activities for a user
+    */
+    case 'build':
+      downloader.buildQueue()
+      break
+
+    /*
+      Pause the downloading of activities
+    */
     case 'pause':
-      state.paused = true
-      broadcastState()
+      downloader.pause()
       break
 
+    /*
+      Resume downloading activities
+    */
     case 'resume':
-      state.paused = false
-      broadcastState()
+      downloader.resume()
       break
+
 
     default:
       console.log(`unhandled: ${e.data}`)
   }
 })
 
+
+self.addEventListener('activate', e => {
+  auth.check()
+})
 
 
 // https://slightlyoff.github.io/ServiceWorker/spec/service_worker/index.html#service-worker-global-scope-skipwaiting
