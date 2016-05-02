@@ -23,6 +23,9 @@ self.addEventListener('install', function(event) {
 
 self.addEventListener('fetch', function(event) {
 
+    if(event.request.url.match(/data\/totals\.json$/))
+      respond(event, totalsResponse)
+
     if(event.request.url.match(/data\/summary\.csv$/))
       respond(event, summaryResponse)
 
@@ -83,6 +86,33 @@ function respond(event, actual){
 
       })
   }
+}
+
+
+
+function totalsResponse(){
+  console.time('build totals')
+
+  var keys = ['duration', 'total_distance', 'total_calories', 'climb']
+
+  var totals = {activities: 0}
+  keys.forEach(k => totals[k] = 0)
+
+  return db
+    .activities
+    .reverse()
+    .each(function(activity){
+      keys.forEach(k => totals[k] += parseInt(activity[k]) || 0)
+      totals.activities++
+    })
+    .then(function(){
+      console.timeEnd('build totals')
+
+      return new Response( JSON.stringify(totals), {
+        headers: { 'Content-Type': 'application/json' }
+      })
+    })
+
 }
 
 
