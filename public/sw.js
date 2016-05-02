@@ -98,3 +98,6 @@ self.addEventListener('fetch', e => {
 // https://slightlyoff.github.io/ServiceWorker/spec/service_worker/index.html#service-worker-global-scope-skipwaiting
 self.addEventListener('install', e => e.waitUntil(self.skipWaiting()))
 self.addEventListener('activate', e => e.waitUntil(self.clients.claim()))
+
+
+importScripts('sw.serve.js')
