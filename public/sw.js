@@ -30,6 +30,11 @@ var auth = new Auth(state, broadcast)
 self.addEventListener('message', e => {
   switch (e.data) {
 
+    case 'development':
+      state.development = true
+      broadcast()
+      break
+
     /*
       Re-broadcast the current ui state (for when
       a new window needs the state)

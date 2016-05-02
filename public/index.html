@@ -40,29 +40,29 @@
         </h2>
       </div>
 
-      <div data-show="_.downloaded > 0">
+      <div data-show="_.logged_in">
 
         <hr />
 
         <h1>Formats</h1>
 
         <dl>
-          <dt class="f4 mt3"><a href="/data/summary.csv">data/overview.csv</a></dt>
+          <dt class="f4 mt3"><a href="/data/summary.csv">data/<strong>overview.csv</strong></a></dt>
           <dd>An aggregation of all activities</dd>
 
-          <dt class="f4 mt3"><a href="/data/distances.csv">data/distances.csv</a></dt>
+          <dt class="f4 mt3"><a href="/data/distances.csv">data/<strong>distances.csv</strong></a></dt>
           <dd>Activity, time, distance</dd>
 
-          <dt class="f4 mt3"><a href="/data/paths.csv">data/paths.csv</a></dt>
+          <dt class="f4 mt3"><a href="/data/paths.csv">data/<strong>paths.csv</strong></a></dt>
           <dd>Geojson formatted paths</dd>
 
-          <dt class="f4 mt3"><a href="/data/geo.json">data/geo.json</a></dt>
+          <dt class="f4 mt3"><a href="/data/geo.json">data/<strong>geo.json</strong></a></dt>
           <dd>Geojson formatted paths</dd>
 
-          <dt class="f4 mt3"><a href="/data/geo.simple.json">data/geo.simple.json</a></dt>
+          <dt class="f4 mt3"><a href="/data/geo.simple.json">data/<strong>geo.simple.</strong>json</a></dt>
           <dd>Geojson formatted paths</dd>
 
-          <dt class="f4 mt3"><a href="/data/binary.path.b">data/paths.raw</a></dt>
+          <dt class="f4 mt3"><a href="/data/binary.path.b">data/<strong>paths.raw</strong></a></dt>
           <dd>…</dd>
         </dl>
 
@@ -127,6 +127,9 @@
                               registration.active
 
           serviceWorker.postMessage('broadcast')
+
+          if(document.location.hostname == 'localhost')
+            serviceWorker.postMessage('development')
 
           // tell sometimes points at redundant sw
           tell = serviceWorker.postMessage.bind(serviceWorker)

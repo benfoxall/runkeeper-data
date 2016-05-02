@@ -1,13 +1,5 @@
 importScripts('components/async/dist/async.min.js')
 
-function burst(path) {
-
-  // uncomment in development (localhost)
-  // return path + (path.indexOf('?') > -1 ? '&' : '?') + 'dev'
-
-  return path
-}
-
 function Downloader(state, broadcaster) {
   this.state = state
   this.broadcaster = broadcaster
@@ -19,6 +11,13 @@ function Downloader(state, broadcaster) {
   this.downloaded = new Set()
 
   this.processor = async.queue(this._processor.bind(this), 2)
+
+}
+
+Downloader.prototype.burst = function(path) {
+  return this.state.development ?
+    (path + (path.indexOf('?') > -1 ? '&' : '?') + 'dev') :
+    path
 }
 
 // process a uri (cb style for async)
@@ -30,6 +29,8 @@ Downloader.prototype._processor = function (uri, callback) {
   var token = this.state.u_token
 
   console.log('⬇️', uri)
+
+  var burst = this.burst.bind(this)
 
   db.activities
     .where('uri').equals(uri)
@@ -50,13 +51,13 @@ Downloader.prototype._processor = function (uri, callback) {
       state.downloaded = downloaded.size
       broadcast()
 
+      // this is not sufficient - something could be
+      // being generated
       if(self.RK_CACHE) {
         return caches.delete(self.RK_CACHE)
-          .then(function() {
-            console.log("deleted cache")
-          })
       }
     })
+    .catch(console.error.bind(console))
     .then(function() {callback()})
 
 }
@@ -86,9 +87,12 @@ Downloader.prototype.destroy = function() {
 
   this.queue.clear()
   this.downloaded.clear()
+  this.processor.resume()
 
   this.state.total = 0
   this.state.downloaded = 0
+  this.state.paused = false
+  
   this.broadcaster()
 }
 
@@ -107,7 +111,7 @@ Downloader.prototype.build = function() {
   }
 
   var popupateQueue = (path, token, urls) =>
-    fetch('https://api.runkeeper.com' + burst(path), {
+    fetch('https://api.runkeeper.com' + this.burst(path), {
         headers: {
           'Authorization': 'Bearer ' + token,
           'Accept': 'application/vnd.com.runkeeper.FitnessActivityFeed+json'
