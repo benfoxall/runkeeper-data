@@ -1,0 +1,13 @@
+CHANGELOG.md
+LICENSE
+Makefile
+README.md
+bower.json
+component.json
+deps
+karma.conf.js
+lib
+mocha_test
+package.json
+perf
+support
