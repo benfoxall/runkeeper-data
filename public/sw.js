@@ -79,9 +79,17 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
 
   // after login/logout re-check authentication
-  // TODO - erase all info on logout
-  if(e.request.url.match(/\/\?sw-(login|logout)$/)){
+  var match = e.request.url.match(/\/\?sw-(login|logout)$/)
+  if(match){
+
+    // this might be nicer as a response to auth.check
+    if(match[1] == 'login')
+      downloader.buildQueue()
+    else
+      downloader.destroy()
+
     auth.check()
+
     e.respondWith(
       Response.redirect('/',302)
     )

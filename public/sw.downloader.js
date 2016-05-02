@@ -74,6 +74,23 @@ Downloader.prototype.resume = function() {
   this.broadcaster()
 }
 
+Downloader.prototype.destroy = function() {
+
+  db.activities.clear()
+    .then(() => {
+      console.log("activities cleared from db")
+    })
+  
+  this.processor.kill()
+
+  this.queue.clear()
+  this.downloaded.clear()
+
+  this.state.total = 0
+  this.state.downloaded = 0
+  this.broadcaster()
+}
+
 Downloader.prototype.dequeue = function() {
   // this.iter = this.queue[Symbol.iterator]()
 
@@ -98,6 +115,7 @@ Downloader.prototype.dequeue = function() {
 Downloader.prototype.buildQueue = function() {
 
   this.queue.clear()
+  this.downloaded.clear()
 
   // NOT SURE IF THIS IS RIGHT
   this.processor.kill()
@@ -134,6 +152,5 @@ Downloader.prototype.buildQueue = function() {
     .then(function(){
       console.log("completed building queue")
     })
-
 
 }
