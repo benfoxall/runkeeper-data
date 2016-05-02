@@ -1,5 +1,12 @@
 importScripts('components/async/dist/async.min.js')
 
+function burst(path) {
+
+  // uncomment in development (localhost)
+  // return path + (path.indexOf('?') > -1 ? '&' : '?') + 'dev'
+
+  return path
+}
 
 function Downloader(state, broadcaster) {
   this.state = state
@@ -10,13 +17,6 @@ function Downloader(state, broadcaster) {
 
   this.queue = new Set()
   this.downloaded = new Set()
-
-  this.iter = this.queue[Symbol.iterator]()
-
-  var populateActivity = (uri) =>
-    fetch('data' + uri, { credentials: 'include' })
-      .then(res => res.json() )
-      .then((data) => db.activities.put(data) )
 
   this.processor = async.queue(this._processor.bind(this), 2)
 }
@@ -35,7 +35,7 @@ Downloader.prototype._processor = function (uri, callback) {
     .where('uri').equals(uri)
     .count(function(c){
       if(c === 0)
-        return fetch('https://api.runkeeper.com' + uri, {
+        return fetch('https://api.runkeeper.com' + burst(uri), {
             headers: {
               'Authorization': 'Bearer ' + token,
               'Accept': 'application/vnd.com.runkeeper.FitnessActivity+json'
@@ -49,14 +49,15 @@ Downloader.prototype._processor = function (uri, callback) {
       downloaded.add(uri)
       state.downloaded = downloaded.size
       broadcast()
+
+      if(self.RK_CACHE) {
+        return caches.delete(self.RK_CACHE)
+          .then(function() {
+            console.log("deleted cache")
+          })
+      }
     })
-    // .then(update)
-    .then(callback)
-
-}
-
-
-Downloader.prototype.start = function() {
+    .then(function() {callback()})
 
 }
 
@@ -80,7 +81,7 @@ Downloader.prototype.destroy = function() {
     .then(() => {
       console.log("activities cleared from db")
     })
-  
+
   this.processor.kill()
 
   this.queue.clear()
@@ -91,28 +92,8 @@ Downloader.prototype.destroy = function() {
   this.broadcaster()
 }
 
-Downloader.prototype.dequeue = function() {
-  // this.iter = this.queue[Symbol.iterator]()
 
-  var next = this.iter.next().value
-
-  if(next) {
-    this.queue.delete(next)
-
-    console.log("REQUEST", next)
-  }
-
-
-  // request({
-  //   url:'https://api.runkeeper.com/fitnessActivities/' + req.params.id + (url_parts.search || ''),
-  //   headers: {
-  //     'Authorization': 'Bearer ' + req.user._access_token,
-  //     'Accept': 'application/vnd.com.runkeeper.FitnessActivity+json'
-  //   }
-  // }).pipe(res);
-}
-
-Downloader.prototype.buildQueue = function() {
+Downloader.prototype.build = function() {
 
   this.queue.clear()
   this.downloaded.clear()
@@ -126,11 +107,12 @@ Downloader.prototype.buildQueue = function() {
   }
 
   var popupateQueue = (path, token, urls) =>
-    fetch('https://api.runkeeper.com' + path, {
+    fetch('https://api.runkeeper.com' + burst(path), {
         headers: {
           'Authorization': 'Bearer ' + token,
           'Accept': 'application/vnd.com.runkeeper.FitnessActivityFeed+json'
         }
+        // cache: 'reload'
       })
       .then(res => res.json())
       .then(res => {

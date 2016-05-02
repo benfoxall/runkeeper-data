@@ -48,7 +48,7 @@ self.addEventListener('message', e => {
       Request all activities for a user
     */
     case 'build':
-      downloader.buildQueue()
+      downloader.build()
       break
 
     /*
@@ -84,7 +84,7 @@ self.addEventListener('fetch', e => {
     auth.check()
       .then(logged_in => {
         if(logged_in)
-          downloader.buildQueue()
+          downloader.build()
         else
           downloader.destroy()
       })

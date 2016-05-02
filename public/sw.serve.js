@@ -6,7 +6,7 @@ var simplify = require('simplify-geojson')
 // all the responses could go into the cache
 // though indexeddb allows them to be carved
 // up a bit easier
-var CACHE_NAME = "RK_DATA";
+var RK_CACHE = "RK_DATA";
 
 self.addEventListener('install', function(event) {
   console.log("installing SW");
@@ -23,32 +23,27 @@ self.addEventListener('install', function(event) {
 
 self.addEventListener('fetch', function(event) {
 
-    if(event.request.url.match(/sw\/summary\.csv$/)){
+    if(event.request.url.match(/sw\/summary\.csv$/))
       respond(event, summaryResponse)
-    }
-    if(event.request.url.match(/sw\/distances\.csv$/)){
+
+    if(event.request.url.match(/sw\/distances\.csv$/))
       respond(event, distancesResponse)
-    }
 
-    if(event.request.url.match(/sw\/paths\.csv$/)){
+    if(event.request.url.match(/sw\/paths\.csv$/))
       respond(event, pathsResponse)
-    }
 
-    if(event.request.url.match(/sw\/geo\.json$/)){
+    if(event.request.url.match(/sw\/geo\.json$/))
       respond(event, geoJSONResponse)
-    }
 
-    if(event.request.url.match(/sw\/geo\.simple\.json$/)){
+    if(event.request.url.match(/sw\/geo\.simple\.json$/))
       respond(event, geoJSONResponseSimple)
-    }
 
-    if(event.request.url.match(/sw\/binary\.path\.b$/)){
+    if(event.request.url.match(/sw\/binary\.path\.b$/))
       respond(event, binaryPathResponse)
-    }
 
     if(event.request.url.match(/sw\/expire-cache$/)){
       event.respondWith(
-        caches.delete(CACHE_NAME)
+        caches.delete(RK_CACHE)
         .then(function(){
           return new Response("okay")
         })
@@ -79,7 +74,7 @@ function respond(event, actual){
 
         var responseToCache = response.clone();
 
-        caches.open(CACHE_NAME)
+        caches.open(RK_CACHE)
           .then(function(cache) {
             cache.put(event.request, responseToCache);
           });

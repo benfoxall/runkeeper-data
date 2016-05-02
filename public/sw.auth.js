@@ -8,9 +8,9 @@ Auth.prototype.check = function() {
     .then(res => res.json())
     .then(res => {
 
-      this.state.logged_in = !!res._access_token
+      var s = !!res._access_token
 
-      if(res._access_token) {
+      if(s) {
         this.state.u_token = res._access_token
         this.state.u_name = res.name
         this.state.u_url = res.url
@@ -20,9 +20,11 @@ Auth.prototype.check = function() {
         this.state.u_url = null
       }
 
-      this.broadcaster()
+      this.state.logged_in = s
 
-      return this.state.logged_in
+      this.broadcaster()
+      
+      return s
     })
 
 }
