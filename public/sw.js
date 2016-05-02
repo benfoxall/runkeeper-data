@@ -1,9 +1,9 @@
-console.log("sw.js")
 
 importScripts(
   'sw.auth.js',
   'sw.db.js',
-  'sw.downloader.js'
+  'sw.downloader.js',
+  'components/localforage/dist/localforage.js'
 )
 
 
@@ -19,6 +19,7 @@ function broadcast() {
       client.postMessage({state:state})
     })
   })
+  localforage.setItem('state', state)
 }
 
 
@@ -73,7 +74,21 @@ self.addEventListener('message', e => {
 
 
 self.addEventListener('activate', e => {
-  auth.check()
+
+  e.waitUntil(
+
+    localforage.getItem('state')
+      .then((stashed) => {
+        if(stashed){
+          Object.keys(stashed).forEach(k => {
+            state[k] = stashed[k]
+          })
+          console.log('start state', state)
+        }
+      })
+      .then( r => auth.check())
+  )
+
 })
 
 self.addEventListener('fetch', e => {
