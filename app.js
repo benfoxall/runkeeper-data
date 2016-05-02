@@ -72,18 +72,21 @@ app.use(passport.session())
 // GET  / - status and frontend ui
 // GET  /auth/runkeeper - authorise session with runkeeper
 // POST /logout - de-authorise
+// GET  /current - the details of the authorised user
 
 app.get('/auth/runkeeper', passport.authenticate('runkeeper'))
 
 app.get('/auth/runkeeper/callback',
   passport.authenticate('runkeeper', { failureRedirect: '/?failed' }),
-  (req, res) => res.redirect('/')
+  (req, res) => res.redirect('/?sw-login')
 )
 
 app.get('/logout', (req, res) => {
   req.logout()
-  res.redirect('/')
+  res.redirect('/?sw-logout')
 })
+
+app.get('/current', (req, res) => res.send(req.user || {user:'none'}))
 
 app.use(express.static(__dirname + '/public'))
 

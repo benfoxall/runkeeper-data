@@ -75,6 +75,17 @@ self.addEventListener('activate', e => {
   auth.check()
 })
 
+self.addEventListener('fetch', e => {
+
+  // after login/logout re-check authentication
+  // TODO - erase all info on logout
+  if(e.request.url.match(/\/\?sw-(login|logout)$/)){
+    auth.check()
+    e.respondWith(
+      Response.redirect('/',302)
+    )
+  }
+})
 
 // https://slightlyoff.github.io/ServiceWorker/spec/service_worker/index.html#service-worker-global-scope-skipwaiting
 self.addEventListener('install', e => e.waitUntil(self.skipWaiting()))
