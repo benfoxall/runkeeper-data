@@ -244,6 +244,8 @@
         return slides
       }, [])
 
+      slides.push(function(){_scroll(document.body)})
+
       window.addEventListener('keydown', e => {
         if(e.keyCode == 34) {
           e.preventDefault()
