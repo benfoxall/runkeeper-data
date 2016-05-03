@@ -149,9 +149,6 @@
 
           serviceWorker.postMessage('broadcast')
 
-          if(document.location.hostname == 'localhost')
-            serviceWorker.postMessage('development')
-
           // tell sometimes points at redundant sw
           tell = serviceWorker.postMessage.bind(serviceWorker)
 

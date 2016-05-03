@@ -1,6 +1,4 @@
-
-
-
+console.log("[sw.js]")
 
 importScripts(
   'sw.auth.js',
@@ -32,11 +30,6 @@ var auth = new Auth(state, broadcast)
 // dispatch events from postMessage
 self.addEventListener('message', e => {
   switch (e.data) {
-
-    case 'development':
-      state.development = true
-      broadcast()
-      break
 
     /*
       Re-broadcast the current ui state (for when

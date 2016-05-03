@@ -14,8 +14,9 @@ function Downloader(state, broadcaster) {
 
 }
 
-Downloader.prototype.burst = function(path) {
-  return this.state.development ?
+// cache burst depending on whether local (cors caching)
+function burst(path) {
+  return self.registration.scope.indexOf('localhost') > 0 ?
     (path + (path.indexOf('?') > -1 ? '&' : '?') + 'dev2') :
     path
 }
@@ -29,8 +30,6 @@ Downloader.prototype._processor = function (uri, callback) {
   var token = this.state.u_token
 
   console.log('⬇️', uri)
-
-  var burst = this.burst.bind(this)
 
   db.activities
     .where('uri').equals(uri)
@@ -111,7 +110,7 @@ Downloader.prototype.build = function() {
   }
 
   var popupateQueue = (path, token, urls) =>
-    fetch('https://api.runkeeper.com' + this.burst(path), {
+    fetch('https://api.runkeeper.com' + burst(path), {
         headers: {
           'Authorization': 'Bearer ' + token,
           'Accept': 'application/vnd.com.runkeeper.FitnessActivityFeed+json'
