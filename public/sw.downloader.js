@@ -16,9 +16,9 @@ function Downloader(state, broadcaster) {
 
 // cache burst depending on whether local (cors caching)
 function burst(path) {
-  return self.registration.scope.indexOf('localhost') > 0 ?
-    (path + (path.indexOf('?') > -1 ? '&' : '?') + 'dev2') :
-    path
+  var tok = self.registration.scope.indexOf('localhost') > 0 ? 'dev2' : 'prod'
+
+  return path + (path.indexOf('?') > -1 ? '&' : '?') + tok
 }
 
 // process a uri (cb style for async)
