@@ -208,6 +208,52 @@
 
 
 
+      // presentation clicker support
+
+      document.body.style.paddingBottom = '60vh'
+
+      function _scroll(element){
+        var current = window.scrollY
+        var target = element.offsetTop
+
+        // TWEEN.Easing.Quadratic.InOut
+        var ease = function (n){return(n*=2)<1?.5*n*n:-.5*(--n*(n-2)-1)}
+        var t = window.performance.now()
+        function update(time){
+          var passed = (time - t)/1250
+          if(passed < 1){
+            requestAnimationFrame(update)
+            window.scrollTo(0, current + (ease(passed) * (target - current)))
+          } else {
+            window.scrollTo(0, current + (ease(1) * (target - current)))
+            console.log('finish')
+          }
+        }
+        requestAnimationFrame(update)
+
+      }
+
+      var slides = [].reduce.call(document.querySelectorAll('[data-demo]'), function(slides, button){
+        var heading = button.parentElement.previousElementSibling
+        slides.push(function(){
+          _scroll(heading)
+          button.className = 'next'
+        }, function(){
+          button.click()
+        })
+        return slides
+      }, [])
+
+      window.addEventListener('keydown', e => {
+        if(e.keyCode == 34) {
+          e.preventDefault()
+          console.log("--")
+          var n = slides.shift()
+          if(n) n()
+        }
+      })
+
+
     </script>
 
     <style media="screen">
@@ -252,6 +298,18 @@
     }
     .runkeeper-paths .vis {
       min-height:600px;
+    }
+
+    button {
+      padding: 1em;
+      border: none;
+      background: #eee;
+      font-size: 1.5em;
+      transition: .2s
+    }
+
+    button:hover,button:focus,button.next {
+      color:aquamarine;
     }
 
 

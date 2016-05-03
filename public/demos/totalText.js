@@ -1,4 +1,7 @@
 function totalText(element){
+  // hide button (this only happens once)
+  element.nextSibling.style.display = 'none'
+
 
   fetch('/data/totals.json')
     .then(r => r.json())
